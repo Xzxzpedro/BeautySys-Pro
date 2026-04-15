@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="PT-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>BeautySys Pro - Sistema de Agendamento</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        * { font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #f4f2ef; padding: 20px; min-height: 100vh; }
+        .card-custom { border: none; border-radius: 28px; box-shadow: 0 12px 28px rgba(0,0,0,0.05); background: white; }
+        .bg-dark-charcoal { background-color: #1e1f2c !important; }
+        .btn-amber { background-color: #f8b281; border: none; color: #1e1f2c; font-weight: 600; transition: all 0.2s; }
+        .btn-amber:hover { background-color: #f5a15a; transform: translateY(-2px); }
+        .btn-dark-charcoal { background-color: #2d2e3a; border: none; color: white; font-weight: 600; }
+        .btn-dark-charcoal:hover { background-color: #1e1f2c; }
+        .avatar-circle { width: 45px; height: 45px; background: #f8b281; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; color: #1e1f2c; }
+        .list-item-glass { background: #fefcf9; border-radius: 20px; padding: 14px 20px; margin-bottom: 12px; border: 1px solid #f0e7e0; transition: 0.2s; }
+        .list-item-glass:hover { background: #fff8f0; border-color: #f8b281; }
+        .input-custom { border-radius: 60px; padding: 12px 18px; border: 1px solid #e2dbd3; background: #ffffff; }
+        .input-custom:focus { border-color: #f8b281; outline: none; box-shadow: 0 0 0 3px rgba(248,178,129,0.2); }
+        .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px 40px; border-radius: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 9999; display: none; }
+        .nav-pills .nav-link { border-radius: 60px; padding: 10px 24px; font-weight: 600; color: #3a2c29; }
+        .nav-pills .nav-link.active { background: #2d2e3a; color: #f8b281; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .status-pendente { background: #fff3cd; color: #856404; }
+        .status-confirmado { background: #d4edda; color: #155724; }
+        .status-cancelado { background: #f8d7da; color: #721c24; }
+        .status-finalizado { background: #cce5ff; color: #004085; }
+        .btn-finalizar { background-color: #28a745; color: white; border: none; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; transition: all 0.2s; }
+        .btn-finalizar:hover { background-color: #218838; transform: translateY(-1px); }
+        @media (max-width: 768px) { body { padding: 12px; } }
+    </style>
+</head>
+<body>
+
+<div class="container-lg px-0 px-md-2">
+    <div class="bg-dark-charcoal rounded-4 p-3 p-md-4 mb-4 text-white shadow-sm">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <h1 class="display-6 fw-semibold" style="background: linear-gradient(135deg, #f8b281, #fcd5aa); -webkit-background-clip: text; background-clip: text; color: transparent;">✨ BeautySys Pro</h1>
+                <p class="mb-0 opacity-75 small">Sistema profissional de agendamento</p>
+            </div>
+            <div class="d-flex gap-3 align-items-center mt-2 mt-sm-0">
+                <div class="d-flex align-items-center gap-2 bg-dark p-2 px-3 rounded-pill">
+                    <div class="avatar-circle" id="userAvatar">👤</div>
+                    <div>
+                        <div class="small opacity-75" id="userRoleLabel">Visitante</div>
+                        <strong id="userNameDisplay">Não logado</strong>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="btn btn-outline-light rounded-pill px-3 d-none">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Login -->
+    <div id="loginScreen" class="card-custom rounded-4 p-4 p-md-5" style="max-width: 500px; margin: 0 auto;">
+        <div class="text-center mb-4">
+            <i class="bi bi-scissors fs-1" style="color: #f8b281;"></i>
+            <h2 class="mt-3 fw-bold">Bem-vindo ao BeautySys</h2>
+            <p class="text-muted">Sistema profissional de agendamento</p>
+        </div>
+        
+        <div class="mb-4">
+            <label class="fw-semibold mb-2">Contas de demonstração:</label>
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <button class="btn btn-outline-secondary w-100 demo-login" data-email="cliente@teste.com" data-senha="123">
+                        <i class="bi bi-person"></i> Cliente
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-secondary w-100 demo-login" data-email="barbeiro@teste.com" data-senha="123">
+                        <i class="bi bi-scissors"></i> Barbeiro
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-secondary w-100 demo-login" data-email="admin@teste.com" data-senha="123">
+                        <i class="bi bi-shield-lock"></i> Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <form id="loginForm">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Email</label>
+                <input type="email" id="loginEmail" class="form-control input-custom" placeholder="seu@email.com" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Senha</label>
+                <input type="password" id="loginSenha" class="form-control input-custom" placeholder="********" required>
+            </div>
+            <button type="submit" class="btn btn-amber w-100 py-2 rounded-pill fw-bold">Entrar</button>
+        </form>
+        
+        <hr class="my-4">
+        <div class="text-center">
+            <p class="text-muted small mb-2">Não tem conta? Cadastre-se</p>
+            <button class="btn btn-dark-charcoal rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#cadastroModal">
+                <i class="bi bi-person-plus"></i> Criar nova conta
+            </button>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="mainDashboard" style="display: none;">
+        <ul class="nav nav-pills mb-4 gap-2 flex-wrap" id="dashboardTabs" role="tablist"></ul>
+        <div class="tab-content" id="dashboardContent"></div>
+    </div>
+</div>
+
+<!-- Modal Cadastro -->
+<div class="modal fade" id="cadastroModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-dark-charcoal text-white">
+                <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Criar nova conta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="cadastroForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nome completo</label>
+                        <input type="text" id="cadastroNome" class="form-control input-custom" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email</label>
+                        <input type="email" id="cadastroEmail" class="form-control input-custom" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">WhatsApp</label>
+                        <input type="tel" id="cadastroWhatsapp" class="form-control input-custom" placeholder="(11) 99999-9999">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Senha</label>
+                        <input type="password" id="cadastroSenha" class="form-control input-custom" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tipo de conta</label>
+                        <select id="cadastroTipo" class="form-select input-custom">
+                            <option value="cliente">👤 Cliente</option>
+                            <option value="barbeiro">💇 Barbeiro</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-amber w-100 py-2 rounded-pill fw-bold">Criar conta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="loading" id="loading"><i class="bi bi-hourglass-split"></i> Carregando...</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+// ==================== CONFIGURAÇÃO DO SUPABASE ====================
+const SUPABASE_URL = 'https://cxeoeydywwzljlpbpliu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4ZW9leWR5d3d6bGpscGJwbGl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTgwMjEsImV4cCI6MjA5MTgzNDAyMX0.82IDCQVTwIVbHNvveMqqsxcMa9e2jbwSHSKySa89dns';
+
+window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let usuarioLogado = null;
+
+function showLoading() { document.getElementById('loading').style.display = 'flex'; }
+function hideLoading() { document.getElementById('loading').style.display = 'none'; }
+
+// ==================== LOGIN ====================
+async function fazerLogin(email, senha) {
+    showLoading();
+    
+    try {
+        const { data: userData, error: userError } = await window.supabaseClient
+            .from('usuarios')
+            .select('*')
+            .eq('email', email)
+            .single();
+        
+        hideLoading();
+        
+        if (userError) {
+            alert('❌ Usuário não encontrado! Use:\ncliente@teste.com\nbarbeiro@teste.com\nadmin@teste.com');
+            return false;
+        }
+        
+        usuarioLogado = userData;
+        localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+        
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainDashboard').style.display = 'block';
+        document.getElementById('logoutBtn').classList.remove('d-none');
+        document.getElementById('userNameDisplay').innerText = usuarioLogado.nome;
+        
+        let roleText = '';
+        if (usuarioLogado.tipo === 'cliente') roleText = '👤 Cliente';
+        else if (usuarioLogado.tipo === 'barbeiro') roleText = '💇 Barbeiro';
+        else roleText = '👑 Administrador';
+        document.getElementById('userRoleLabel').innerText = roleText;
+        document.getElementById('userAvatar').innerHTML = usuarioLogado.nome.charAt(0).toUpperCase();
+        
+        await renderDashboard();
+        return true;
+        
+    } catch (error) {
+        hideLoading();
+        alert('❌ Erro ao fazer login: ' + error.message);
+        return false;
+    }
+}
+
+// ==================== CADASTRO ====================
+async function cadastrarUsuario(nome, email, whatsapp, senha, tipo) {
+    showLoading();
+    try {
+        const { error } = await window.supabaseClient
+            .from('usuarios')
+            .insert([{ 
+                nome: nome, 
+                email: email, 
+                whatsapp: whatsapp,
+                tipo: tipo 
+            }]);
+        
+        hideLoading();
+        
+        if (error) {
+            if (error.message.includes('duplicate') || error.code === '23505') {
+                alert('❌ Este email já está cadastrado!');
+            } else {
+                alert('❌ Erro: ' + error.message);
+            }
+            return false;
+        }
+        
+        alert('✅ Conta criada com sucesso! Faça login.');
+        return true;
+        
+    } catch (error) {
+        hideLoading();
+        alert('❌ Erro: ' + error.message);
+        return false;
+    }
+}
+
+// ==================== BUSCAR DADOS ====================
+async function getServicos() {
+    const { data, error } = await window.supabaseClient
+        .from('servicos')
+        .select('*')
+        .eq('ativo', true);
+    
+    if (error) {
+        console.error('Erro ao buscar serviços:', error);
+        return [];
+    }
+    return data || [];
+}
+
+async function getProfissionais() {
+    const { data, error } = await window.supabaseClient
+        .from('profissionais')
+        .select('*')
+        .eq('ativo', true);
+    
+    if (error) {
+        console.error('Erro ao buscar profissionais:', error);
+        return [];
+    }
+    return data || [];
+}
+
+async function getAgendamentos(filtros = {}) {
+    let query = window.supabaseClient.from('agendamentos').select('*, servicos(*), profissionais(*)');
+    
+    if (filtros.cliente_id) {
+        query = query.eq('cliente_id', filtros.cliente_id);
+    }
+    if (filtros.profissional_id) {
+        query = query.eq('profissional_id', filtros.profissional_id);
+    }
+    if (filtros.data) {
+        query = query.eq('data', filtros.data);
+    }
+    if (filtros.status) {
+        query = query.eq('status', filtros.status);
+    }
+    
+    const { data, error } = await query.order('data', { ascending: false }).order('horario', { ascending: false });
+    
+    if (error) {
+        console.error('Erro ao buscar agendamentos:', error);
+        return [];
+    }
+    
+    // Buscar nomes dos clientes
+    for (let ag of data) {
+        if (ag.cliente_id) {
+            const { data: clienteData } = await window.supabaseClient
+                .from('usuarios')
+                .select('nome, whatsapp')
+                .eq('id', ag.cliente_id)
+                .single();
+            ag.cliente_nome = clienteData?.nome || 'Cliente';
+            ag.cliente_whatsapp = clienteData?.whatsapp || '';
+        }
+    }
+    
+    return data || [];
+}
+
+async function criarAgendamento(agendamento) {
+    showLoading();
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('agendamentos')
+            .insert([agendamento])
+            .select();
+        
+        hideLoading();
+        
+        if (error) {
+            alert('❌ Erro ao criar agendamento: ' + error.message);
+            return false;
+        }
+        
+        alert('✅ Agendamento realizado com sucesso!');
+        return true;
+    } catch (error) {
+        hideLoading();
+        alert('❌ Erro: ' + error.message);
+        return false;
+    }
+}
+
+async function cancelarAgendamento(id) {
+    if (!confirm('Tem certeza que deseja cancelar este agendamento?')) return false;
+    
+    showLoading();
+    try {
+        const { error } = await window.supabaseClient
+            .from('agendamentos')
+            .update({ status: 'cancelado' })
+            .eq('id', id);
+        
+        hideLoading();
+        
+        if (error) {
+            alert('❌ Erro ao cancelar: ' + error.message);
+            return false;
+        }
+        
+        alert('✅ Agendamento cancelado!');
+        return true;
+    } catch (error) {
+        hideLoading();
+        alert('❌ Erro: ' + error.message);
+        return false;
+    }
+}
+
+async function finalizarAgendamento(id) {
+    if (!confirm('Marcar este serviço como finalizado?')) return false;
+    
+    showLoading();
+    try {
+        const { error } = await window.supabaseClient
+            .from('agendamentos')
+            .update({ status: 'finalizado' })
+            .eq('id', id);
+        
+        hideLoading();
+        
+        if (error) {
+            alert('❌ Erro ao finalizar: ' + error.message);
+            return false;
+        }
+        
+        alert('✅ Serviço finalizado com sucesso!');
+        await carregarConteudoAba('agendaHoje');
+        await carregarConteudoAba('historico');
+        return true;
+    } catch (error) {
+        hideLoading();
+        alert('❌ Erro: ' + error.message);
+        return false;
+    }
+}
+
+// ==================== DASHBOARD ====================
+async function renderDashboard() {
+    if (!usuarioLogado) return;
+    
+    const tabsContainer = document.getElementById('dashboardTabs');
+    const contentContainer = document.getElementById('dashboardContent');
+    
+    let tabs = [];
+    
+    if (usuarioLogado.tipo === 'cliente') {
+        tabs = [
+            { id: 'agendar', icon: 'bi-calendar-plus', nome: '📅 Agendar' },
+            { id: 'meusAgendamentos', icon: 'bi-list-check', nome: '📋 Meus Agendamentos' }
+        ];
+    } else if (usuarioLogado.tipo === 'barbeiro') {
+        tabs = [
+            { id: 'agendaHoje', icon: 'bi-calendar-day', nome: '📆 Agenda do Dia' },
+            { id: 'historico', icon: 'bi-clock-history', nome: '📊 Histórico de Cortes' }
+        ];
+    } else if (usuarioLogado.tipo === 'admin') {
+        tabs = [
+            { id: 'todosAgendamentos', icon: 'bi-calendar2-week', nome: '📋 Todos Agendamentos' },
+            { id: 'servicos', icon: 'bi-tags', nome: '✂️ Serviços' },
+            { id: 'profissionais', icon: 'bi-person-badge', nome: '👥 Profissionais' }
+        ];
+    }
+    
+    tabsContainer.innerHTML = tabs.map((tab, idx) => `
+        <li class="nav-item">
+            <button class="nav-link ${idx === 0 ? 'active' : ''}" data-bs-toggle="pill" data-bs-target="#tab-${tab.id}">
+                <i class="bi ${tab.icon} me-1"></i> ${tab.nome}
+            </button>
+        </li>
+    `).join('');
+    
+    contentContainer.innerHTML = tabs.map(tab => `
+        <div class="tab-pane fade ${tab === tabs[0] ? 'show active' : ''}" id="tab-${tab.id}">
+            <div class="card-custom rounded-4 p-4" id="content-${tab.id}">
+                <div class="text-center py-5">🔄 Carregando...</div>
+            </div>
+        </div>
+    `).join('');
+    
+    for (const tab of tabs) {
+        await carregarConteudoAba(tab.id);
+    }
+}
+
+async function carregarConteudoAba(tabId) {
+    const container = document.querySelector(`#content-${tabId}`);
+    if (!container) return;
+    
+    if (tabId === 'agendar') {
+        const servicos = await getServicos();
+        const profissionais = await getProfissionais();
+        
+        if (servicos.length === 0 || profissionais.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="bi bi-exclamation-triangle fs-1 text-warning"></i>
+                    <p class="mt-3">⚠️ Nenhum serviço ou profissional cadastrado!</p>
+                    <small>Execute o SQL completo no Supabase primeiro.</small>
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <h4 class="fw-bold mb-4"><i class="bi bi-calendar-plus me-2"></i>Agendar Horário</h4>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="fw-semibold">✂️ Serviço</label>
+                        <select id="servicoSelect" class="form-select input-custom mt-1">
+                            ${servicos.map(s => `<option value="${s.id}" data-preco="${s.preco}" data-duracao="${s.duracao || 30}">${s.nome} - R$ ${s.preco}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-semibold">💇 Profissional</label>
+                        <select id="profissionalSelect" class="form-select input-custom mt-1">
+                            ${profissionais.map(p => `<option value="${p.id}">${p.nome}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-semibold">📅 Data</label>
+                        <input type="date" id="dataSelect" class="form-control input-custom mt-1" min="${new Date().toISOString().split('T')[0]}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-semibold">⏰ Horário</label>
+                        <select id="horarioSelect" class="form-select input-custom mt-1">
+                            <option>09:00</option><option>10:00</option><option>11:00</option>
+                            <option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button id="confirmarAgendamentoBtn" class="btn btn-amber w-100 py-2 rounded-pill fw-bold">
+                            Confirmar Agendamento
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('confirmarAgendamentoBtn').addEventListener('click', async () => {
+                const servicoId = parseInt(document.getElementById('servicoSelect').value);
+                const profissionalId = parseInt(document.getElementById('profissionalSelect').value);
+                const data = document.getElementById('dataSelect').value;
+                const horario = document.getElementById('horarioSelect').value;
+                
+                if (!data) {
+                    alert('❌ Selecione uma data!');
+                    return;
+                }
+                
+                const novoAgendamento = {
+                    cliente_id: usuarioLogado.id,
+                    profissional_id: profissionalId,
+                    servico_id: servicoId,
+                    data: data,
+                    horario: horario,
+                    status: 'confirmado',
+                    created_at: new Date().toISOString()
+                };
+                
+                if (await criarAgendamento(novoAgendamento)) {
+                    await carregarConteudoAba('meusAgendamentos');
+                    const agendarTab = document.querySelector('[data-bs-target="#tab-meusAgendamentos"]');
+                    if (agendarTab) {
+                        new bootstrap.Tab(agendarTab).show();
+                    }
+                }
+            });
+        }
+    } 
+    else if (tabId === 'meusAgendamentos') {
+        let agendamentos = await getAgendamentos({ cliente_id: usuarioLogado.id });
+        
+        if (agendamentos.length === 0) {
+            container.innerHTML = `<div class="text-center py-5 text-muted">📭 Nenhum agendamento encontrado.</div>`;
+        } else {
+            container.innerHTML = `
+                <h4 class="fw-bold mb-4"><i class="bi bi-calendar-check me-2"></i>Meus Agendamentos</h4>
+                ${agendamentos.map(ag => `
+                    <div class="list-item-glass">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap">
+                            <div>
+                                <strong>${ag.servicos?.nome || 'Serviço'}</strong><br>
+                                <small class="text-muted">
+                                    📅 ${new Date(ag.data).toLocaleDateString('pt-BR')} às ${ag.horario}<br>
+                                    💇 Profissional: ${ag.profissionais?.nome || 'Profissional'}<br>
+                                    💰 Valor: R$ ${ag.servicos?.preco || '0'}
+                                </small>
+                                <div class="mt-2">
+                                    <span class="status-badge status-${ag.status}">
+                                        ${ag.status === 'confirmado' ? '✓ Confirmado' : ag.status === 'cancelado' ? '✗ Cancelado' : ag.status === 'finalizado' ? '✅ Finalizado' : '⏳ Pendente'}
+                                    </span>
+                                </div>
+                            </div>
+                            ${ag.status === 'confirmado' ? `
+                                <button class="btn btn-sm btn-outline-danger rounded-pill mt-2 mt-sm-0" onclick="cancelarAgendamento(${ag.id})">
+                                    Cancelar
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+    }
+    else if (tabId === 'agendaHoje') {
+        const hoje = new Date().toISOString().split('T')[0];
+        const profissionais = await getProfissionais();
+        const profissional = profissionais.find(p => p.nome === usuarioLogado.nome);
+        
+        let agendamentos = [];
+        if (profissional) {
+            agendamentos = await getAgendamentos({ profissional_id: profissional.id, data: hoje, status: 'confirmado' });
+        }
+        
+        if (agendamentos.length === 0) {
+            container.innerHTML = `<div class="text-center py-5 text-muted">📭 Nenhum agendamento para hoje.</div>`;
+        } else {
+            container.innerHTML = `
+                <h4 class="fw-bold mb-4"><i class="bi bi-calendar-day me-2"></i>Agenda de Hoje - ${new Date().toLocaleDateString('pt-BR')}</h4>
+                ${agendamentos.map(ag => `
+                    <div class="list-item-glass">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap">
+                            <div style="flex: 1;">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong class="fs-5">⏰ ${ag.horario}</strong>
+                                    <span class="status-badge status-${ag.status}">
+                                        ${ag.status === 'confirmado' ? '✓ Confirmado' : ag.status === 'finalizado' ? '✅ Finalizado' : '⏳ Pendente'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <strong>👤 Cliente:</strong> ${ag.cliente_nome || 'Cliente'}<br>
+                                    <strong>✂️ Serviço:</strong> ${ag.servicos?.nome || 'Serviço'}<br>
+                                    <strong>💰 Valor:</strong> R$ ${ag.servicos?.preco || '0'}<br>
+                                    ${ag.cliente_whatsapp ? `<strong>📱 WhatsApp:</strong> <a href="https://wa.me/${ag.cliente_whatsapp.replace(/\D/g, '')}" target="_blank">${ag.cliente_whatsapp}</a><br>` : ''}
+                                </div>
+                            </div>
+                            ${ag.status === 'confirmado' ? `
+                                <button class="btn btn-finalizar mt-2 mt-sm-0" onclick="finalizarAgendamento(${ag.id})">
+                                    <i class="bi bi-check-circle"></i> Finalizar
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+    }
+    else if (tabId === 'historico') {
+        const profissionais = await getProfissionais();
+        const profissional = profissionais.find(p => p.nome === usuarioLogado.nome);
+        
+        let historico = [];
+        if (profissional) {
+            historico = await getAgendamentos({ profissional_id: profissional.id, status: 'finalizado' });
+        }
+        
+        if (historico.length === 0) {
+            container.innerHTML = `<div class="text-center py-5 text-muted">📊 Nenhum corte finalizado ainda.</div>`;
+        } else {
+            // Calcular estatísticas
+            const totalCortes = historico.length;
+            const valorTotal = historico.reduce((sum, ag) => sum + (ag.servicos?.preco || 0), 0);
+            const servicosMaisRealizados = {};
+            historico.forEach(ag => {
+                const nomeServico = ag.servicos?.nome || 'Serviço';
+                servicosMaisRealizados[nomeServico] = (servicosMaisRealizados[nomeServico] || 0) + 1;
+            });
+            
+            container.innerHTML = `
+                <h4 class="fw-bold mb-4"><i class="bi bi-clock-history me-2"></i>Histórico de Cortes Finalizados</h4>
+                
+                <!-- Cards de Estatísticas -->
+                <div class="row mb-4">
+                    <div class="col-md-4 mb-3">
+                        <div class="card-custom p-3 text-center">
+                            <i class="bi bi-scissors fs-2 text-amber"></i>
+                            <h3 class="mb-0 mt-2">${totalCortes}</h3>
+                            <small class="text-muted">Total de Cortes</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card-custom p-3 text-center">
+                            <i class="bi bi-cash-stack fs-2 text-success"></i>
+                            <h3 class="mb-0 mt-2">R$ ${valorTotal.toFixed(2)}</h3>
+                            <small class="text-muted">Faturamento Total</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card-custom p-3 text-center">
+                            <i class="bi bi-trophy fs-2 text-warning"></i>
+                            <h3 class="mb-0 mt-2">${Object.keys(servicosMaisRealizados).length}</h3>
+                            <small class="text-muted">Tipos de Serviços</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lista de Histórico -->
+                <h5 class="mb-3"><i class="bi bi-list-ul"></i> Lista de Cortes Realizados</h5>
+                ${historico.map(ag => `
+                    <div class="list-item-glass">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap">
+                            <div style="flex: 1;">
+                                <div class="mb-2">
+                                    <strong class="fs-5">${ag.servicos?.nome || 'Serviço'}</strong>
+                                    <span class="status-badge status-finalizado ms-2">✅ Finalizado</span>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <small class="text-muted">
+                                            <i class="bi bi-calendar"></i> ${new Date(ag.data).toLocaleDateString('pt-BR')} às ${ag.horario}<br>
+                                            <i class="bi bi-person"></i> Cliente: <strong>${ag.cliente_nome || 'Cliente'}</strong><br>
+                                            <i class="bi bi-cash"></i> Valor: <strong class="text-success">R$ ${ag.servicos?.preco || '0'}</strong>
+                                        </small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <small class="text-muted">
+                                            <i class="bi bi-whatsapp"></i> 
+                                            ${ag.cliente_whatsapp ? `<a href="https://wa.me/${ag.cliente_whatsapp.replace(/\D/g, '')}" target="_blank">${ag.cliente_whatsapp}</a>` : 'WhatsApp não informado'}<br>
+                                            <i class="bi bi-hourglass-split"></i> Duração: ${ag.servicos?.duracao || 30} minutos
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+    }
+    else if (tabId === 'todosAgendamentos') {
+        const agendamentos = await getAgendamentos();
+        
+        if (agendamentos.length === 0) {
+            container.innerHTML = `<div class="text-center py-5 text-muted">📭 Nenhum agendamento encontrado.</div>`;
+        } else {
+            container.innerHTML = `
+                <h4 class="fw-bold mb-4"><i class="bi bi-calendar2-week me-2"></i>Todos os Agendamentos</h4>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data/Horário</th>
+                                <th>Cliente</th>
+                                <th>Profissional</th>
+                                <th>Serviço</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${agendamentos.map(ag => `
+                                <tr>
+                                    <td>${new Date(ag.data).toLocaleDateString('pt-BR')} ${ag.horario}</td>
+                                    <td>${ag.cliente_nome || 'Cliente'}</td>
+                                    <td>${ag.profissionais?.nome || 'Profissional'}</td>
+                                    <td>${ag.servicos?.nome || 'Serviço'}</td>
+                                    <td><span class="status-badge status-${ag.status}">
+                                        ${ag.status === 'confirmado' ? '✓ Confirmado' : ag.status === 'cancelado' ? '✗ Cancelado' : ag.status === 'finalizado' ? '✅ Finalizado' : '⏳ Pendente'}
+                                    </span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+    }
+    else if (tabId === 'servicos') {
+        const servicos = await getServicos();
+        container.innerHTML = `
+            <h4 class="fw-bold mb-4"><i class="bi bi-tags me-2"></i>Serviços Disponíveis</h4>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr><th>Serviço</th><th>Duração</th><th>Preço</th></tr>
+                    </thead>
+                    <tbody>
+                        ${servicos.map(s => `<tr><td><strong>${s.nome}</strong></td><td>${s.duracao || 30} min</td><td><span class="badge bg-dark">R$ ${s.preco}</span></td>`).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+    else if (tabId === 'profissionais') {
+        const profissionais = await getProfissionais();
+        container.innerHTML = `
+            <h4 class="fw-bold mb-4"><i class="bi bi-person-badge me-2"></i>Nossos Profissionais</h4>
+            ${profissionais.map(p => `
+                <div class="list-item-glass">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar-circle" style="width: 50px; height: 50px; font-size: 1.5rem;">${p.nome.charAt(0)}</div>
+                        <div>
+                            <strong>${p.nome}</strong>
+                            <div class="small text-muted">${p.especialidade || 'Especialista'}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        `;
+    }
+}
+
+// ==================== EVENTOS ====================
+document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const senha = document.getElementById('loginSenha').value;
+    await fazerLogin(email, senha);
+});
+
+document.getElementById('cadastroForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nome = document.getElementById('cadastroNome').value;
+    const email = document.getElementById('cadastroEmail').value;
+    const whatsapp = document.getElementById('cadastroWhatsapp').value;
+    const senha = document.getElementById('cadastroSenha').value;
+    const tipo = document.getElementById('cadastroTipo').value;
+    
+    if (await cadastrarUsuario(nome, email, whatsapp, senha, tipo)) {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('cadastroModal'));
+        if (modal) modal.hide();
+        document.getElementById('cadastroForm').reset();
+    }
+});
+
+document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    localStorage.removeItem('usuarioLogado');
+    usuarioLogado = null;
+    document.getElementById('loginScreen').style.display = 'block';
+    document.getElementById('mainDashboard').style.display = 'none';
+    document.getElementById('logoutBtn').classList.add('d-none');
+});
+
+document.querySelectorAll('.demo-login').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const email = btn.getAttribute('data-email');
+        const senha = btn.getAttribute('data-senha');
+        await fazerLogin(email, senha);
+    });
+});
+
+// Tornar funções globais para o onclick
+window.cancelarAgendamento = cancelarAgendamento;
+window.finalizarAgendamento = finalizarAgendamento;
+
+// ==================== INICIALIZAÇÃO ====================
+(async function init() {
+    const storedUser = localStorage.getItem('usuarioLogado');
+    if (storedUser) {
+        try {
+            usuarioLogado = JSON.parse(storedUser);
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainDashboard').style.display = 'block';
+            document.getElementById('logoutBtn').classList.remove('d-none');
+            document.getElementById('userNameDisplay').innerText = usuarioLogado.nome;
+            document.getElementById('userRoleLabel').innerText = usuarioLogado.tipo === 'cliente' ? '👤 Cliente' : (usuarioLogado.tipo === 'barbeiro' ? '💇 Barbeiro' : '👑 Admin');
+            document.getElementById('userAvatar').innerHTML = usuarioLogado.nome.charAt(0).toUpperCase();
+            await renderDashboard();
+        } catch (e) {
+            console.warn('Erro ao restaurar sessão:', e);
+        }
+    }
+})();
+</script>
+</body>
+</html>
